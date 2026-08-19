@@ -16,7 +16,6 @@ body {
   background-blend-mode: normal, normal;
   background-size: auto, 900px;
   background-repeat: repeat, repeat;
-  background-attachment: fixed, fixed;
   color: #241b1f;
   -webkit-font-smoothing: antialiased;
 }
