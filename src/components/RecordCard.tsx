@@ -36,7 +36,7 @@ export default function RecordCard({ record, onClick }: Props) {
   if (record.status === 'want') {
     return (
       <button onClick={onClick} className="relative shrink-0 h-full" style={{ aspectRatio: '122 / 132' }}>
-        <div className="absolute left-0 right-0" style={{ top: 5, aspectRatio: '1 / 1' }}>
+        <div className="absolute left-0" style={{ top: 5, width: '100%', aspectRatio: '1 / 1' }}>
           <Cover record={record} />
         </div>
         <span className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/35 backdrop-blur-sm flex items-center justify-center">
@@ -51,7 +51,7 @@ export default function RecordCard({ record, onClick }: Props) {
       <div className="absolute flex items-center" style={{ inset: '3.79% 30.57% 3.61% 0' }}>
         <Cover record={record} />
       </div>
-      <div className="absolute overflow-hidden pointer-events-none" style={{ left: '69.33%', right: 0, top: 0, aspectRatio: '54 / 132' } as CSSProperties}>
+      <div className="absolute overflow-hidden pointer-events-none" style={{ left: '69.33%', right: 0, top: 0, height: '100%' } as CSSProperties}>
         <img
           src={vinylImg}
           alt=""
