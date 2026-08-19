@@ -75,7 +75,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="px-6 pt-3 flex flex-col" style={{ gap: 50 }}>
+      <main className="px-6 pt-3 flex flex-col" style={{ gap: 38 }}>
         {shelves.length === 0 && filter !== 'all' && (
           <p className="text-sm text-black/40 py-6 text-center">
             {filter === 'have' ? 'Todavía no marcaste ningún disco como tuyo.' : 'Tu wishlist está vacía.'}
