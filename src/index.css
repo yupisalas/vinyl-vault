@@ -9,13 +9,7 @@ html, body, #root {
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
-  background-color: #d6d5d1;
-  background-image:
-    linear-gradient(165deg, rgba(230,229,224,0.35) 0%, rgba(180,179,173,0.45) 100%),
-    url('./assets/bg/concrete.jpg');
-  background-blend-mode: normal, normal;
-  background-size: auto, 900px;
-  background-repeat: repeat, repeat;
+  background: #ffffff;
   color: #241b1f;
   -webkit-font-smoothing: antialiased;
 }
