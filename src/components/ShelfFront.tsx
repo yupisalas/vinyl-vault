@@ -18,7 +18,15 @@ export default function ShelfFront({ category }: Props) {
   return (
     <div className="absolute" style={{ left: 0, width: '97.21%', top: '42.47%', height: '58.12%' }}>
       <div className="absolute inset-0" style={{ containerType: 'inline-size' } as CSSProperties}>
-        <div className="absolute pointer-events-none select-none" style={{ inset: '33.5% 0 19.27% 0' }}>
+        <div
+          className="absolute pointer-events-none select-none"
+          style={{
+            inset: '33.5% 0 19.27% 0',
+            backdropFilter: 'blur(3px)',
+            WebkitBackdropFilter: 'blur(3px)',
+            borderRadius: '12px',
+          } as CSSProperties}
+        >
           <div className="absolute" style={{ inset: '-1.83% -0.22% -1.77% 2.31%' }}>
             <img src={ledgeImg} alt="" className="block w-full h-full" draggable={false} />
           </div>

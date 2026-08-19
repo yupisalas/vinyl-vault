@@ -54,8 +54,12 @@ export default function ShelfBack() {
           borderRadius: '11.93px 11.93px 4.338px 7.592px',
         }}
       />
-      <Screw style={{ left: '3.84%', top: '4.02%' }} />
-      <Screw style={{ right: '3.84%', top: '4.02%' }} />
+      {/* nudged in a bit further than the raw Figma offset so the circle
+          clears the panel's rounded corner entirely — sitting right at the
+          curve made the overlapping sliver look cut off against the soft
+          blur behind it instead of the crisp panel */}
+      <Screw style={{ left: '5.6%', top: '6.5%' }} />
+      <Screw style={{ right: '5.6%', top: '6.5%' }} />
 
       <div className="absolute pointer-events-none select-none" style={{ inset: '87.65% 0 0 2.07%' }}>
         <div className="absolute" style={{ inset: '-20% -0.32%' }}>
