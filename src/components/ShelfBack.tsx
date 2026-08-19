@@ -1,9 +1,20 @@
 import type { CSSProperties } from 'react'
 import ledgeGlowImg from '../assets/figma/v2/ledgeglow.svg'
 
+// width/height are EXPLICIT here (4.73% / 10.81% of the shelf box, matching
+// the native 18.2676x17.5212 viewBox) — the previous version sized this
+// SVG purely from a 4-sided `inset`, with no explicit width/height at all.
+// SVG root elements have their own fallback sizing (often 300x150) when a
+// browser doesn't resolve that inset into a definite size, which is a much
+// better fit for "one giant circle per shelf" than anything in the vinyl
+// rendering we spent the last several fixes on.
 function Screw({ style }: { style: CSSProperties }) {
   return (
-    <svg viewBox="0 0 18.2676 17.5212" className="absolute" style={style}>
+    <svg
+      viewBox="0 0 18.2676 17.5212"
+      className="absolute"
+      style={{ width: '4.73%', height: '10.81%', ...style }}
+    >
       <circle cx="7.59" cy="9.93" r="7.59" fill="#9D9D9D" fillOpacity="0.4" />
       <circle cx="9.78" cy="8.08" r="7.59" fill="#1A1A1A" />
       <circle cx="10.68" cy="7.59" r="7.49" fill="url(#screwGradBack)" stroke="url(#screwStrokeBack)" strokeWidth="0.2" />
@@ -43,8 +54,8 @@ export default function ShelfBack() {
           borderRadius: '11.93px 11.93px 4.338px 7.592px',
         }}
       />
-      <Screw style={{ inset: '4.02% 91.43% 85.17% 3.84%' }} />
-      <Screw style={{ inset: '4.02% 6.93% 85.17% 88.34%' }} />
+      <Screw style={{ left: '3.84%', top: '4.02%' }} />
+      <Screw style={{ right: '3.84%', top: '4.02%' }} />
 
       <div className="absolute pointer-events-none select-none" style={{ inset: '87.65% 0 0 2.07%' }}>
         <div className="absolute" style={{ inset: '-20% -0.32%' }}>
