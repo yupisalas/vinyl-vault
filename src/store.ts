@@ -34,16 +34,20 @@ const seedRecords: VinylRecord[] = [
 
 interface VaultState {
   records: VinylRecord[]
+  discogsToken: string
   addRecord: (record: Omit<VinylRecord, 'id' | 'addedAt'>) => string
   updateRecord: (id: string, patch: Partial<Omit<VinylRecord, 'id'>>) => void
   removeRecord: (id: string) => void
   markAsHave: (id: string) => void
+  setDiscogsToken: (token: string) => void
 }
 
 export const useVaultStore = create<VaultState>()(
   persist(
     (set) => ({
       records: seedRecords,
+      discogsToken: '',
+      setDiscogsToken: (token) => set({ discogsToken: token.trim() }),
       addRecord: (record) => {
         const id = uuid()
         set((state) => ({

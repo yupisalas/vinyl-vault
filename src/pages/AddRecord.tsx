@@ -1,13 +1,17 @@
 import { useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useVaultStore } from '../store'
-import { IconArrowLeft, IconCamera } from '../components/icons'
+import { searchByBarcode, getRelease, type DiscogsCandidate } from '../lib/discogs'
+import BarcodeScanner from '../components/BarcodeScanner'
+import { IconArrowLeft, IconCamera, IconBarcode } from '../components/icons'
 import type { RecordStatus } from '../types'
 
 export default function AddRecord() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const addRecord = useVaultStore((s) => s.addRecord)
+  const discogsToken = useVaultStore((s) => s.discogsToken)
+  const setDiscogsToken = useVaultStore((s) => s.setDiscogsToken)
   const existingCategories = useVaultStore((s) =>
     Array.from(new Set(s.records.map((r) => r.category)))
   )
@@ -19,6 +23,15 @@ export default function AddRecord() {
   const [category, setCategory] = useState(existingCategories[0] ?? '')
   const [newCategory, setNewCategory] = useState('')
   const [status, setStatus] = useState<RecordStatus>(searchParams.get('status') === 'want' ? 'want' : 'have')
+  const [sideA, setSideA] = useState<string[]>([])
+  const [sideB, setSideB] = useState<string[]>([])
+
+  const [tokenDraft, setTokenDraft] = useState('')
+  const [showScanner, setShowScanner] = useState(false)
+  const [barcodeInput, setBarcodeInput] = useState('')
+  const [lookupState, setLookupState] = useState<'idle' | 'loading' | 'error'>('idle')
+  const [lookupError, setLookupError] = useState('')
+  const [candidates, setCandidates] = useState<DiscogsCandidate[] | null>(null)
 
   const finalCategory = category === '__new__' ? newCategory.trim() : category
 
@@ -30,9 +43,65 @@ export default function AddRecord() {
     reader.readAsDataURL(file)
   }
 
+  function applyRelease(r: { title: string; artist: string; coverImage: string; sideA: string[]; sideB: string[] }) {
+    setTitle(r.title)
+    setArtist(r.artist)
+    if (r.coverImage) setPhoto(r.coverImage)
+    setSideA(r.sideA)
+    setSideB(r.sideB)
+    setCandidates(null)
+    setLookupState('idle')
+  }
+
+  async function runLookup(code: string) {
+    if (!code.trim()) return
+    if (!discogsToken) return
+    setLookupState('loading')
+    setLookupError('')
+    setCandidates(null)
+    try {
+      const results = await searchByBarcode(code.trim(), discogsToken)
+      if (results.length === 0) {
+        setLookupState('error')
+        setLookupError('No encontramos ese código en Discogs.')
+        return
+      }
+      if (results.length === 1) {
+        const release = await getRelease(results[0].id, discogsToken)
+        applyRelease(release)
+      } else {
+        setCandidates(results)
+        setLookupState('idle')
+      }
+    } catch (err) {
+      setLookupState('error')
+      setLookupError(err instanceof Error ? err.message : 'Algo falló buscando en Discogs.')
+    }
+  }
+
+  async function pickCandidate(c: DiscogsCandidate) {
+    if (!discogsToken) return
+    setLookupState('loading')
+    try {
+      const release = await getRelease(c.id, discogsToken)
+      applyRelease(release)
+    } catch (err) {
+      setLookupState('error')
+      setLookupError(err instanceof Error ? err.message : 'Algo falló buscando en Discogs.')
+    }
+  }
+
   function handleSave() {
     if (!title.trim() || !artist.trim() || !finalCategory) return
-    const id = addRecord({ title: title.trim(), artist: artist.trim(), category: finalCategory, coverImage: photo, status })
+    const id = addRecord({
+      title: title.trim(),
+      artist: artist.trim(),
+      category: finalCategory,
+      coverImage: photo,
+      status,
+      sideA: sideA.length ? sideA : undefined,
+      sideB: sideB.length ? sideB : undefined,
+    })
     navigate(`/record/${id}`)
   }
 
@@ -47,7 +116,7 @@ export default function AddRecord() {
         <h1 className="font-display text-lg font-semibold">Añadir disco</h1>
       </header>
 
-      <main className="px-5 space-y-5">
+      <main className="px-5 space-y-5 pb-6">
         <div className="flex gap-2">
           <button
             onClick={() => setStatus('have')}
@@ -65,6 +134,84 @@ export default function AddRecord() {
           >
             Lo quiero
           </button>
+        </div>
+
+        <div className="rounded-2xl border border-black/10 bg-white/60 p-4 space-y-3">
+          <p className="text-xs font-medium text-black/50">Buscar por código de barras (Discogs)</p>
+
+          {!discogsToken ? (
+            <div className="space-y-2">
+              <p className="text-xs text-black/45 leading-snug">
+                Necesitás un token personal gratuito de Discogs. Lo generás en discogs.com → Settings → Developers → Generate new token, y lo pegás acá. Se guarda solo en este dispositivo.
+              </p>
+              <div className="flex gap-2">
+                <input
+                  value={tokenDraft}
+                  onChange={(e) => setTokenDraft(e.target.value)}
+                  placeholder="Pegá tu token de Discogs"
+                  className="flex-1 rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm outline-none focus:border-black/30"
+                />
+                <button
+                  onClick={() => setDiscogsToken(tokenDraft)}
+                  disabled={!tokenDraft.trim()}
+                  className="px-4 rounded-xl bg-vault-ink text-white text-sm font-medium disabled:opacity-30"
+                >
+                  Guardar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex gap-2">
+                <input
+                  value={barcodeInput}
+                  onChange={(e) => setBarcodeInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && runLookup(barcodeInput)}
+                  inputMode="numeric"
+                  placeholder="Código de barras (UPC/EAN)"
+                  className="flex-1 rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm outline-none focus:border-black/30"
+                />
+                <button
+                  onClick={() => runLookup(barcodeInput)}
+                  disabled={!barcodeInput.trim() || lookupState === 'loading'}
+                  className="px-4 rounded-xl bg-vault-ink text-white text-sm font-medium disabled:opacity-30"
+                >
+                  Buscar
+                </button>
+              </div>
+              <button
+                onClick={() => setShowScanner(true)}
+                className="w-full py-2.5 rounded-xl border border-black/15 text-sm font-medium flex items-center justify-center gap-2"
+              >
+                <IconBarcode className="w-4 h-4" />
+                Escanear con la cámara
+              </button>
+
+              {lookupState === 'loading' && <p className="text-xs text-black/45">Buscando en Discogs…</p>}
+              {lookupState === 'error' && <p className="text-xs text-red-500">{lookupError}</p>}
+              {candidates && (
+                <div className="space-y-2 pt-1">
+                  <p className="text-xs text-black/45">Encontramos varias ediciones, elegí la tuya:</p>
+                  {candidates.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => pickCandidate(c)}
+                      className="w-full flex items-center gap-3 rounded-xl border border-black/10 bg-white px-3 py-2 text-left"
+                    >
+                      {c.thumb ? (
+                        <img src={c.thumb} alt="" className="w-10 h-10 rounded-md object-cover shrink-0" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-md bg-black/10 shrink-0" />
+                      )}
+                      <span className="text-xs leading-snug">
+                        {c.title} {c.year ? `(${c.year})` : ''}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         <button
@@ -132,6 +279,23 @@ export default function AddRecord() {
               />
             )}
           </div>
+
+          {(sideA.length > 0 || sideB.length > 0) && (
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <div>
+                <label className="text-xs font-medium text-black/50">Lado A</label>
+                <div className="mt-1 rounded-xl border border-black/10 bg-white/70 px-3 py-2.5 text-xs space-y-0.5 max-h-32 overflow-y-auto">
+                  {sideA.map((t, i) => <p key={i}>{t}</p>)}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-black/50">Lado B</label>
+                <div className="mt-1 rounded-xl border border-black/10 bg-white/70 px-3 py-2.5 text-xs space-y-0.5 max-h-32 overflow-y-auto">
+                  {sideB.map((t, i) => <p key={i}>{t}</p>)}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <button
@@ -142,6 +306,17 @@ export default function AddRecord() {
           {status === 'have' ? 'Guardar en la colección' : 'Guardar en wishlist'}
         </button>
       </main>
+
+      {showScanner && (
+        <BarcodeScanner
+          onClose={() => setShowScanner(false)}
+          onDetect={(code) => {
+            setShowScanner(false)
+            setBarcodeInput(code)
+            runLookup(code)
+          }}
+        />
+      )}
     </div>
   )
 }

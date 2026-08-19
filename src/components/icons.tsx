@@ -55,6 +55,12 @@ export const IconShare = ({ className }: IconProps) => (
   </svg>
 )
 
+export const IconBarcode = ({ className }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className}>
+    <path d="M4 5v14M8 5v14M11 5v14M13.5 5v14M17 5v14M20 5v14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+  </svg>
+)
+
 export const IconTrash = ({ className }: IconProps) => (
   <svg viewBox="0 0 24 24" fill="none" className={className}>
     <path d="M5 7h14M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7m-8 0 .6 12A1.5 1.5 0 0 0 9.1 20.5h5.8a1.5 1.5 0 0 0 1.5-1.5L17 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
