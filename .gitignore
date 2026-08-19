@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+
+# scratch reference material gathered while matching the Figma design —
+# not part of the app itself
+/reference
+refe.jpeg
+
+# local tool config, not part of the app
+.claude
