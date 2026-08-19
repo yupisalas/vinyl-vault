@@ -32,37 +32,46 @@ function Cover({ record, roundedClass = 'rounded-[5.5%]' }: { record: VinylRecor
 // 132px height exactly (container 122x132, cover starting 5px from the
 // top), so both sit on the exact same base and read as the same size.
 //
-// The vinyl disc is a pre-cropped crescent asset (not a runtime CSS crop of
-// the full circle) — WebKit on iOS wasn't reliably resolving a percentage
-// width/height chain built on top of an aspect-ratio-derived flex-item
-// size, and rendered the disc at its full intrinsic 350x350 instead.
-// Baking the crop into the asset removes that whole dependency chain.
+// Two WebKit/iOS workarounds baked in here:
+// 1. The card is NOT itself the flex item. Safari doesn't reliably size a
+//    flex item whose WIDTH comes from `aspect-ratio` + an explicit height —
+//    it rendered arbitrarily huge. Wrapping it in a plain flex-item div
+//    (height:100%, width:auto/content-based) and putting `aspect-ratio` on
+//    a normal-flow child inside that div avoids the flex-item case
+//    entirely (this is the well-supported "explicit height → derive
+//    width" direction, just not as a direct flex child).
+// 2. The vinyl disc is a pre-cropped crescent asset, not a runtime CSS
+//    crop of the full circle — one less derived-size layer.
 export default function RecordCard({ record, onClick }: Props) {
   if (record.status === 'want') {
     return (
-      <button onClick={onClick} className="relative shrink-0 h-full" style={{ aspectRatio: '122 / 132' }}>
-        <div className="absolute left-0" style={{ top: 5, width: '100%', aspectRatio: '1 / 1' }}>
-          <Cover record={record} />
-        </div>
-        <span className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/35 backdrop-blur-sm flex items-center justify-center">
-          <IconHeart className="w-3 h-3 text-white" />
-        </span>
-      </button>
+      <div className="h-full shrink-0">
+        <button onClick={onClick} className="relative block h-full" style={{ aspectRatio: '122 / 132' }}>
+          <div className="absolute left-0" style={{ top: 5, width: '100%', aspectRatio: '1 / 1' }}>
+            <Cover record={record} />
+          </div>
+          <span className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/35 backdrop-blur-sm flex items-center justify-center">
+            <IconHeart className="w-3 h-3 text-white" />
+          </span>
+        </button>
+      </div>
     )
   }
 
   return (
-    <button onClick={onClick} className="relative shrink-0 h-full" style={{ aspectRatio: '176.042 / 132' }}>
-      <div className="absolute flex items-center" style={{ inset: '3.79% 30.57% 3.61% 0' }}>
-        <Cover record={record} />
-      </div>
-      <img
-        src={vinylCrescent}
-        alt=""
-        className="absolute pointer-events-none select-none"
-        style={{ left: '69.33%', right: 0, top: 0, bottom: 0, width: '30.67%', height: '100%', objectFit: 'cover' }}
-        draggable={false}
-      />
-    </button>
+    <div className="h-full shrink-0">
+      <button onClick={onClick} className="relative block h-full" style={{ aspectRatio: '176.042 / 132' }}>
+        <div className="absolute flex items-center" style={{ inset: '3.79% 30.57% 3.61% 0' }}>
+          <Cover record={record} />
+        </div>
+        <img
+          src={vinylCrescent}
+          alt=""
+          className="absolute pointer-events-none select-none"
+          style={{ left: '69.33%', right: 0, top: 0, bottom: 0, width: '30.67%', height: '100%', objectFit: 'cover' }}
+          draggable={false}
+        />
+      </button>
+    </div>
   )
 }
