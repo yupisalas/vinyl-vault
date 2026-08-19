@@ -42,6 +42,9 @@ function Cover({ record, roundedClass = 'rounded-[5.5%]' }: { record: VinylRecor
 //    width" direction, just not as a direct flex child).
 // 2. The vinyl disc is a pre-cropped crescent asset, not a runtime CSS
 //    crop of the full circle — one less derived-size layer.
+// 3. It's rendered as a background-image div, not an <img> with
+//    object-fit — the cover art next to it (also a background-image div)
+//    was never affected by this bug, only the object-fit <img> was.
 export default function RecordCard({ record, onClick }: Props) {
   if (record.status === 'want') {
     return (
@@ -64,12 +67,18 @@ export default function RecordCard({ record, onClick }: Props) {
         <div className="absolute flex items-center" style={{ inset: '3.79% 30.57% 3.61% 0' }}>
           <Cover record={record} />
         </div>
-        <img
-          src={vinylCrescent}
-          alt=""
-          className="absolute pointer-events-none select-none"
-          style={{ left: '69.33%', right: 0, top: 0, bottom: 0, width: '30.67%', height: '100%', objectFit: 'cover' }}
-          draggable={false}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            left: '69.33%',
+            right: 0,
+            top: 0,
+            bottom: 0,
+            backgroundImage: `url(${vinylCrescent})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
         />
       </button>
     </div>
