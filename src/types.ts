@@ -9,6 +9,7 @@ export interface VinylRecord {
   status: RecordStatus
   addedAt: string
   story?: string
+  storySource?: string
   sideA?: string[]
   sideB?: string[]
 }

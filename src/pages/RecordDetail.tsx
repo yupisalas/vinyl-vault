@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useVaultStore } from '../store'
 import { coverGradient } from '../lib/palette'
+import { findAlbumStory } from '../lib/wikipedia'
 import vinylImg from '../assets/figma/v2/vinyl.png'
 import { IconArrowLeft, IconTrash, IconShare, IconHeart } from '../components/icons'
 
@@ -19,10 +20,48 @@ export default function RecordDetail() {
   const markAsHave = useVaultStore((s) => s.markAsHave)
 
   const [shared, setShared] = useState(false)
-  const [story, setStory] = useState(record?.story ?? '')
   const [sideA, setSideA] = useState((record?.sideA ?? []).join('\n'))
   const [sideB, setSideB] = useState((record?.sideB ?? []).join('\n'))
   const [activeSide, setActiveSide] = useState<'A' | 'B'>('A')
+  const [storyState, setStoryState] = useState<'idle' | 'loading' | 'done' | 'notfound' | 'error'>(
+    record?.story ? 'done' : 'idle'
+  )
+
+  useEffect(() => {
+    if (!record || record.story) return
+    let cancelled = false
+    setStoryState('loading')
+    findAlbumStory(record.title, record.artist)
+      .then((result) => {
+        if (cancelled) return
+        if (result) {
+          updateRecord(record.id, { story: result.text, storySource: result.sourceUrl })
+          setStoryState('done')
+        } else {
+          setStoryState('notfound')
+        }
+      })
+      .catch(() => !cancelled && setStoryState('error'))
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [record?.id])
+
+  function refetchStory() {
+    if (!record) return
+    setStoryState('loading')
+    findAlbumStory(record.title, record.artist)
+      .then((result) => {
+        if (result) {
+          updateRecord(record.id, { story: result.text, storySource: result.sourceUrl })
+          setStoryState('done')
+        } else {
+          setStoryState('notfound')
+        }
+      })
+      .catch(() => setStoryState('error'))
+  }
 
   if (!record) {
     return (
@@ -135,15 +174,38 @@ export default function RecordDetail() {
         )}
 
         <div className="mt-7">
-          <label className="text-xs font-medium text-black/50">Mini historia</label>
-          <textarea
-            value={story}
-            onChange={(e) => setStory(e.target.value)}
-            onBlur={() => updateRecord(record.id, { story })}
-            placeholder="Contá algo sobre este disco: dónde lo conseguiste, qué te recuerda..."
-            rows={3}
-            className="w-full mt-1.5 rounded-xl border border-black/10 bg-white/70 px-4 py-3 text-sm outline-none focus:border-black/30 resize-none"
-          />
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-medium text-black/50">Historia del disco</label>
+            {(storyState === 'done' || storyState === 'notfound' || storyState === 'error') && (
+              <button onClick={refetchStory} className="text-xs text-black/40 underline">
+                Buscar de nuevo
+              </button>
+            )}
+          </div>
+          <div className="w-full mt-1.5 rounded-xl border border-black/10 bg-white/70 px-4 py-3 text-sm min-h-[4rem]">
+            {storyState === 'loading' && <p className="text-black/40">Buscando la historia de este disco…</p>}
+            {storyState === 'notfound' && (
+              <p className="text-black/40">No encontramos información de este disco todavía.</p>
+            )}
+            {storyState === 'error' && (
+              <p className="text-black/40">Algo falló buscando la historia. Probá de nuevo.</p>
+            )}
+            {storyState === 'done' && record.story && (
+              <div>
+                <p className="leading-relaxed">{record.story}</p>
+                {record.storySource && (
+                  <a
+                    href={record.storySource}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-2 inline-block text-xs text-black/40 underline"
+                  >
+                    vía Wikipedia
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="mt-5">
