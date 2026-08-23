@@ -36,6 +36,15 @@ export async function searchByBarcode(barcode: string, token: string): Promise<D
     .map((r) => ({ id: r.id, title: r.title, year: r.year, thumb: r.thumb, format: r.format }))
 }
 
+export async function searchByQuery(query: string, token: string): Promise<DiscogsCandidate[]> {
+  const data = await discogsFetch(
+    `/database/search?q=${encodeURIComponent(query)}&type=release&format=Vinyl`,
+    token
+  )
+  const results = (data.results ?? []) as any[]
+  return results.slice(0, 15).map((r) => ({ id: r.id, title: r.title, year: r.year, thumb: r.thumb, format: r.format }))
+}
+
 export async function getRelease(id: number, token: string): Promise<DiscogsRelease> {
   const data = await discogsFetch(`/releases/${id}`, token)
   const [artist, ...titleParts] = String(data.title ?? '').split(' - ')

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useVaultStore } from '../store'
-import { searchByBarcode, getRelease, type DiscogsCandidate } from '../lib/discogs'
+import { searchByBarcode, searchByQuery, getRelease, type DiscogsCandidate } from '../lib/discogs'
 import BarcodeScanner from '../components/BarcodeScanner'
 import { IconArrowLeft, IconCamera, IconBarcode } from '../components/icons'
 import type { RecordStatus } from '../types'
@@ -29,6 +29,7 @@ export default function AddRecord() {
   const [tokenDraft, setTokenDraft] = useState('')
   const [showScanner, setShowScanner] = useState(false)
   const [barcodeInput, setBarcodeInput] = useState('')
+  const [queryInput, setQueryInput] = useState('')
   const [lookupState, setLookupState] = useState<'idle' | 'loading' | 'error'>('idle')
   const [lookupError, setLookupError] = useState('')
   const [candidates, setCandidates] = useState<DiscogsCandidate[] | null>(null)
@@ -53,17 +54,19 @@ export default function AddRecord() {
     setLookupState('idle')
   }
 
-  async function runLookup(code: string) {
-    if (!code.trim()) return
+  async function runLookup(term: string, mode: 'barcode' | 'query') {
+    if (!term.trim()) return
     if (!discogsToken) return
     setLookupState('loading')
     setLookupError('')
     setCandidates(null)
     try {
-      const results = await searchByBarcode(code.trim(), discogsToken)
+      const results = mode === 'barcode'
+        ? await searchByBarcode(term.trim(), discogsToken)
+        : await searchByQuery(term.trim(), discogsToken)
       if (results.length === 0) {
         setLookupState('error')
-        setLookupError('No encontramos ese código en Discogs.')
+        setLookupError('No encontramos nada en Discogs con eso.')
         return
       }
       if (results.length === 1) {
@@ -137,7 +140,7 @@ export default function AddRecord() {
         </div>
 
         <div className="rounded-2xl border border-black/10 bg-white/60 p-4 space-y-3">
-          <p className="text-xs font-medium text-black/50">Buscar por código de barras (Discogs)</p>
+          <p className="text-xs font-medium text-black/50">Buscar en Discogs</p>
 
           {!discogsToken ? (
             <div className="space-y-2">
@@ -166,13 +169,13 @@ export default function AddRecord() {
                 <input
                   value={barcodeInput}
                   onChange={(e) => setBarcodeInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && runLookup(barcodeInput)}
+                  onKeyDown={(e) => e.key === 'Enter' && runLookup(barcodeInput, 'barcode')}
                   inputMode="numeric"
                   placeholder="Código de barras (UPC/EAN)"
                   className="flex-1 rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm outline-none focus:border-black/30"
                 />
                 <button
-                  onClick={() => runLookup(barcodeInput)}
+                  onClick={() => runLookup(barcodeInput, 'barcode')}
                   disabled={!barcodeInput.trim() || lookupState === 'loading'}
                   className="px-4 rounded-xl bg-vault-ink text-white text-sm font-medium disabled:opacity-30"
                 >
@@ -186,6 +189,28 @@ export default function AddRecord() {
                 <IconBarcode className="w-4 h-4" />
                 Escanear con la cámara
               </button>
+
+              <div className="flex items-center gap-2 pt-1">
+                <div className="h-px flex-1 bg-black/10" />
+                <span className="text-[11px] text-black/35">o por título / artista</span>
+                <div className="h-px flex-1 bg-black/10" />
+              </div>
+              <div className="flex gap-2">
+                <input
+                  value={queryInput}
+                  onChange={(e) => setQueryInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && runLookup(queryInput, 'query')}
+                  placeholder="Ej. Kind of Blue Miles Davis"
+                  className="flex-1 rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm outline-none focus:border-black/30"
+                />
+                <button
+                  onClick={() => runLookup(queryInput, 'query')}
+                  disabled={!queryInput.trim() || lookupState === 'loading'}
+                  className="px-4 rounded-xl bg-vault-ink text-white text-sm font-medium disabled:opacity-30"
+                >
+                  Buscar
+                </button>
+              </div>
 
               {lookupState === 'loading' && <p className="text-xs text-black/45">Buscando en Discogs…</p>}
               {lookupState === 'error' && <p className="text-xs text-red-500">{lookupError}</p>}
@@ -313,7 +338,7 @@ export default function AddRecord() {
           onDetect={(code) => {
             setShowScanner(false)
             setBarcodeInput(code)
-            runLookup(code)
+            runLookup(code, 'barcode')
           }}
         />
       )}
