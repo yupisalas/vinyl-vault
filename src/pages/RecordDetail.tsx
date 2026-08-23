@@ -22,6 +22,7 @@ export default function RecordDetail() {
   const [story, setStory] = useState(record?.story ?? '')
   const [sideA, setSideA] = useState((record?.sideA ?? []).join('\n'))
   const [sideB, setSideB] = useState((record?.sideB ?? []).join('\n'))
+  const [activeSide, setActiveSide] = useState<'A' | 'B'>('A')
 
   if (!record) {
     return (
@@ -145,29 +146,46 @@ export default function RecordDetail() {
           />
         </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs font-medium text-black/50">Lado A</label>
+        <div className="mt-5">
+          <div className="flex items-center justify-between px-1">
+            <button
+              onClick={() => setActiveSide('A')}
+              className={`font-display font-semibold transition-all ${
+                activeSide === 'A' ? 'text-xl text-vault-ink' : 'text-sm text-black/35'
+              }`}
+            >
+              Lado A
+            </button>
+            <button
+              onClick={() => setActiveSide('B')}
+              className={`font-display font-semibold transition-all ${
+                activeSide === 'B' ? 'text-xl text-vault-ink' : 'text-sm text-black/35'
+              }`}
+            >
+              Lado B
+            </button>
+          </div>
+          {activeSide === 'A' ? (
             <textarea
+              key="A"
               value={sideA}
               onChange={(e) => setSideA(e.target.value)}
               onBlur={() => updateRecord(record.id, { sideA: sideA.split('\n').map((s) => s.trim()).filter(Boolean) })}
               placeholder={'Tema 1\nTema 2'}
-              rows={4}
-              className="w-full mt-1.5 rounded-xl border border-black/10 bg-white/70 px-3 py-2.5 text-sm outline-none focus:border-black/30 resize-none"
+              rows={6}
+              className="w-full mt-3 rounded-xl border border-black/10 bg-white/70 px-4 py-3 text-sm outline-none focus:border-black/30 resize-none"
             />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-black/50">Lado B</label>
+          ) : (
             <textarea
+              key="B"
               value={sideB}
               onChange={(e) => setSideB(e.target.value)}
               onBlur={() => updateRecord(record.id, { sideB: sideB.split('\n').map((s) => s.trim()).filter(Boolean) })}
               placeholder={'Tema 1\nTema 2'}
-              rows={4}
-              className="w-full mt-1.5 rounded-xl border border-black/10 bg-white/70 px-3 py-2.5 text-sm outline-none focus:border-black/30 resize-none"
+              rows={6}
+              className="w-full mt-3 rounded-xl border border-black/10 bg-white/70 px-4 py-3 text-sm outline-none focus:border-black/30 resize-none"
             />
-          </div>
+          )}
         </div>
       </main>
     </div>
