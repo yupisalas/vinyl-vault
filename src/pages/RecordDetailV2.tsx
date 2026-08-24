@@ -4,7 +4,7 @@ import { useVaultStore } from '../store'
 import { coverGradient } from '../lib/palette'
 import { findAlbumStory } from '../lib/wikipedia'
 import vinylCrescent from '../assets/figma/v2/vinyl-crescent.png'
-import roomBg from '../assets/homev2/room-bg.png'
+import roomBg from '../assets/homev2/room-bg.jpg'
 import { IconArrowLeft, IconTrash, IconShare, IconHeart } from '../components/icons'
 
 const COVER_SIZE = 193
@@ -90,10 +90,16 @@ export default function RecordDetailV2() {
 
   return (
     <div className="relative min-h-screen font-mono" style={{ backgroundColor: '#14171a' }}>
-      <div className="absolute top-0 left-0 right-0 overflow-hidden pointer-events-none" style={{ height: 460 }}>
-        <img src={roomBg} alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0) 60%, #14171a 100%)' }} />
-      </div>
+      <img
+        src={roomBg}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        style={{ objectPosition: 'center bottom' }}
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'linear-gradient(180deg, rgba(20,23,26,0.15) 0%, rgba(20,23,26,0.5) 40%, rgba(20,23,26,0.82) 72%, rgba(20,23,26,0.95) 100%)' }}
+      />
 
       <header className="relative z-10 flex items-center justify-between px-5 pt-6 pb-4">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
