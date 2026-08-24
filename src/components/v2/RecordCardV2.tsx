@@ -19,10 +19,13 @@ export default function RecordCardV2({ record, onClick }: Props) {
   const isWant = record.status === 'want'
 
   return (
+    // The vinyl peek is decorative and overflows past this box on purpose —
+    // width always stays COVER_SIZE so the flex gap between cards reads as
+    // a uniform 12px cover-to-cover regardless of Tengo/Quiero status.
     <button
       onClick={onClick}
-      className="relative shrink-0 flex items-end"
-      style={{ width: COVER_SIZE + (isWant ? 0 : VINYL_WIDTH), height: COVER_SIZE + 4 }}
+      className="relative shrink-0 flex items-end overflow-visible"
+      style={{ width: COVER_SIZE, height: COVER_SIZE + 4 }}
     >
       {!isWant && (
         <div

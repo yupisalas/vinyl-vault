@@ -27,13 +27,14 @@ function PlaceholderSlot({ onAdd }: { onAdd: () => void }) {
         width: 92,
         height: 92,
         borderRadius: '2px 3px 3px 1px',
-        backgroundColor: 'rgba(39,38,38,0.2)',
+        backgroundColor: 'rgba(220,215,205,0.14)',
+        border: '1px solid rgba(239,217,181,0.3)',
         boxShadow: '-2px 2px 5px 1px rgba(0,0,0,0.26)',
       }}
     >
       <span
         className="absolute inset-0 flex items-center justify-center font-mono"
-        style={{ fontSize: 10, color: 'rgba(132,132,132,0.31)', letterSpacing: '-0.4px' }}
+        style={{ fontSize: 10, color: 'rgba(239,217,181,0.6)', letterSpacing: '-0.4px' }}
       >
         [agregar]
       </span>
