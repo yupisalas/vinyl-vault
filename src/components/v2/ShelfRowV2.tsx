@@ -18,14 +18,40 @@ const BACK_GRADIENT = 'linear-gradient(88deg, #3c3b3b 0%, #353333 57.2%, #3e3b3b
 const FRONT_GRADIENT =
   'linear-gradient(88deg, rgb(105,105,105) 0%, rgb(176,174,174) 15.8%, rgb(114,114,114) 28.2%, rgb(177,177,177) 44%, rgb(105,105,105) 55.4%, rgb(177,177,177) 72.9%, rgb(105,105,105) 92.5%, rgb(207,207,207) 103%)'
 
+function PlaceholderSlot({ onAdd }: { onAdd: () => void }) {
+  return (
+    <button
+      onClick={onAdd}
+      className="relative shrink-0"
+      style={{
+        width: 92,
+        height: 92,
+        borderRadius: '2px 3px 3px 1px',
+        backgroundColor: 'rgba(39,38,38,0.2)',
+        boxShadow: '-2px 2px 5px 1px rgba(0,0,0,0.26)',
+      }}
+    >
+      <span
+        className="absolute inset-0 flex items-center justify-center font-mono"
+        style={{ fontSize: 10, color: 'rgba(132,132,132,0.31)', letterSpacing: '-0.4px' }}
+      >
+        [agregar]
+      </span>
+    </button>
+  )
+}
+
 interface Props {
   records: VinylRecord[]
   onSelect: (id: string) => void
   onAdd: () => void
   leftInset?: string
+  minSlots?: number
 }
 
-export default function ShelfRowV2({ records, onSelect, onAdd, leftInset = '1rem' }: Props) {
+export default function ShelfRowV2({ records, onSelect, onAdd, leftInset = '1rem', minSlots = 5 }: Props) {
+  const placeholderCount = Math.max(0, minSlots - records.length)
+
   return (
     <div className="overflow-x-auto no-scrollbar" style={{ height: 110 }}>
       <div className="relative" style={{ width: 'max-content', minWidth: '100%', height: '100%' }}>
@@ -37,28 +63,12 @@ export default function ShelfRowV2({ records, onSelect, onAdd, leftInset = '1rem
           className="relative flex items-end gap-3 pr-4 h-full"
           style={{ paddingLeft: leftInset, paddingBottom: RECORD_BOTTOM_PADDING }}
         >
-          {records.length === 0 ? (
-            <button
-              onClick={onAdd}
-              className="relative shrink-0"
-              style={{
-                width: 92,
-                height: 92,
-                borderRadius: '2px 3px 3px 1px',
-                backgroundColor: 'rgba(39,38,38,0.2)',
-                boxShadow: '-2px 2px 5px 1px rgba(0,0,0,0.26)',
-              }}
-            >
-              <span
-                className="absolute inset-0 flex items-center justify-center font-mono"
-                style={{ fontSize: 10, color: 'rgba(132,132,132,0.31)', letterSpacing: '-0.4px' }}
-              >
-                [agregar]
-              </span>
-            </button>
-          ) : (
-            records.map((r) => <RecordCardV2 key={r.id} record={r} onClick={() => onSelect(r.id)} />)
-          )}
+          {records.map((r) => (
+            <RecordCardV2 key={r.id} record={r} onClick={() => onSelect(r.id)} />
+          ))}
+          {Array.from({ length: placeholderCount }).map((_, i) => (
+            <PlaceholderSlot key={`placeholder-${i}`} onAdd={onAdd} />
+          ))}
         </div>
         <div
           className="absolute right-4 bottom-0 rounded-t-[3px] pointer-events-none"
