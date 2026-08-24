@@ -19,11 +19,11 @@ interface Props {
   leftInset?: string
 }
 
-// The plank renders AFTER (on top of) the records and the record row sits a
-// few px lower than the plank's top edge, so the shelf's front edge grabs
-// and hides a sliver of each record's base — the same "resting inside,
-// not floating on top" language as the acrylic shelf's front ledge.
-const OVERLAP = 6
+// The plank renders AFTER (on top of) the records so its top edge crisply
+// touches the record's base — matching the reference (cover bottom sits
+// ~1px into the plank top, essentially flush). Keep this small: it's a
+// contact edge, not a ledge that swallows the record.
+const OVERLAP = 1
 
 export default function ShelfRowV2({ records, onSelect, onAdd, leftInset = '1rem' }: Props) {
   return (
