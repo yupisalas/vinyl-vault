@@ -6,6 +6,7 @@ export default {
       fontFamily: {
         display: ['Fraunces', 'serif'],
         sans: ['Inter', 'sans-serif'],
+        mono: ['"Space Mono"', 'monospace'],
       },
       colors: {
         vault: {
