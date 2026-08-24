@@ -49,13 +49,14 @@ interface Props {
   onAdd: () => void
   leftInset?: string
   minSlots?: number
+  maxWidth?: number
 }
 
-export default function ShelfRowV2({ records, onSelect, onAdd, leftInset = '1rem', minSlots = 5 }: Props) {
+export default function ShelfRowV2({ records, onSelect, onAdd, leftInset = '1rem', minSlots = 5, maxWidth }: Props) {
   const placeholderCount = Math.max(0, minSlots - records.length)
 
   return (
-    <div className="overflow-x-auto no-scrollbar" style={{ height: 110 }}>
+    <div className="overflow-x-auto no-scrollbar" style={{ height: 110, maxWidth }}>
       <div className="relative" style={{ width: 'max-content', minWidth: '100%', height: '100%' }}>
         <div
           className="absolute right-4 bottom-0 rounded-t-[3px] pointer-events-none"

@@ -113,7 +113,7 @@ export default function HomeV2() {
             records={row}
             onSelect={(id) => navigate(`/record/${id}`)}
             onAdd={() => navigate('/add')}
-            leftInset={i === ROWS - 1 ? '25%' : '1rem'}
+            maxWidth={i === ROWS - 1 ? 280 : undefined}
           />
         </div>
       ))}
