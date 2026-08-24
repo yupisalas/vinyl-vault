@@ -18,14 +18,17 @@ const VINYL_OVERLAP = 16
 export default function RecordCardV2({ record, onClick }: Props) {
   const isWant = record.status === 'want'
 
+  // Only the part of the vinyl that doesn't overlap its own cover needs to
+  // reserve flex space — the rest sits on top of the cover art. This keeps
+  // a true 12px gap from the vinyl's own trailing edge to the next card,
+  // not just from the cover underneath it (which would let them collide).
+  const trailingVinylWidth = isWant ? 0 : VINYL_WIDTH - VINYL_OVERLAP
+
   return (
-    // The vinyl peek is decorative and overflows past this box on purpose —
-    // width always stays COVER_SIZE so the flex gap between cards reads as
-    // a uniform 12px cover-to-cover regardless of Tengo/Quiero status.
     <button
       onClick={onClick}
-      className="relative shrink-0 flex items-end overflow-visible"
-      style={{ width: COVER_SIZE, height: COVER_SIZE + 4 }}
+      className="relative shrink-0 flex items-end"
+      style={{ width: COVER_SIZE + trailingVinylWidth, height: COVER_SIZE + 4 }}
     >
       {!isWant && (
         <div
