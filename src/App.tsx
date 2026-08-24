@@ -4,6 +4,7 @@ import HomeV2 from './pages/HomeV2'
 import AddRecord from './pages/AddRecord'
 import Search from './pages/Search'
 import RecordDetail from './pages/RecordDetail'
+import RecordDetailV2 from './pages/RecordDetailV2'
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
       <Route path="/add" element={<AddRecord />} />
       <Route path="/search" element={<Search />} />
       <Route path="/record/:id" element={<RecordDetail />} />
+      <Route path="/v2/record/:id" element={<RecordDetailV2 />} />
     </Routes>
   )
 }
