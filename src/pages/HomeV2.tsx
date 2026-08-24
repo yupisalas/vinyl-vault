@@ -109,7 +109,12 @@ export default function HomeV2() {
 
       {rows.map((row, i) => (
         <div key={i} className="absolute left-0 right-0" style={{ top: `${ROW_TOPS_PCT[i]}%` }}>
-          <ShelfRowV2 records={row} onSelect={(id) => navigate(`/record/${id}`)} onAdd={() => navigate('/add')} />
+          <ShelfRowV2
+            records={row}
+            onSelect={(id) => navigate(`/record/${id}`)}
+            onAdd={() => navigate('/add')}
+            leftInset={i === ROWS - 1 ? '25%' : '1rem'}
+          />
         </div>
       ))}
 

@@ -16,17 +16,23 @@ interface Props {
   records: VinylRecord[]
   onSelect: (id: string) => void
   onAdd: () => void
+  leftInset?: string
 }
 
-export default function ShelfRowV2({ records, onSelect, onAdd }: Props) {
+// The plank renders AFTER (on top of) the records and the record row sits a
+// few px lower than the plank's top edge, so the shelf's front edge grabs
+// and hides a sliver of each record's base — the same "resting inside,
+// not floating on top" language as the acrylic shelf's front ledge.
+const OVERLAP = 6
+
+export default function ShelfRowV2({ records, onSelect, onAdd, leftInset = '1rem' }: Props) {
   return (
     <div className="overflow-x-auto no-scrollbar" style={{ height: 110 }}>
       <div className="relative" style={{ width: 'max-content', minWidth: '100%', height: '100%' }}>
-        <div className="absolute left-4 right-4 bottom-0 pointer-events-none" style={{ height: PLANK_HEIGHT }}>
-          <div className="absolute inset-0 rounded-t-[3px]" style={{ bottom: '27%', backgroundImage: FRONT_FACE_GRADIENT }} />
-          <div className="absolute inset-x-0 bottom-0 rounded-t-[3px]" style={{ top: '58.7%', backgroundImage: TOP_HIGHLIGHT_GRADIENT }} />
-        </div>
-        <div className="relative flex items-end gap-3 pl-4 pr-4 pb-3.5 h-full">
+        <div
+          className="relative flex items-end gap-3 pr-4 h-full"
+          style={{ paddingLeft: leftInset, paddingBottom: PLANK_HEIGHT - OVERLAP }}
+        >
           {records.length === 0 ? (
             <button
               onClick={onAdd}
@@ -37,6 +43,10 @@ export default function ShelfRowV2({ records, onSelect, onAdd }: Props) {
           ) : (
             records.map((r) => <RecordCardV2 key={r.id} record={r} onClick={() => onSelect(r.id)} />)
           )}
+        </div>
+        <div className="absolute right-4 bottom-0 pointer-events-none" style={{ left: leftInset, height: PLANK_HEIGHT }}>
+          <div className="absolute inset-0 rounded-t-[3px]" style={{ bottom: '27%', backgroundImage: FRONT_FACE_GRADIENT }} />
+          <div className="absolute inset-x-0 bottom-0 rounded-t-[3px]" style={{ top: '58.7%', backgroundImage: TOP_HIGHLIGHT_GRADIENT }} />
         </div>
       </div>
     </div>
