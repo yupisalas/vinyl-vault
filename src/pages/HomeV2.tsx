@@ -112,14 +112,14 @@ export default function HomeV2() {
           <ShelfRowV2
             records={row}
             onSelect={(id) => navigate(`/v2/record/${id}`)}
-            onAdd={() => navigate('/add')}
+            onAdd={() => navigate('/v2/add')}
             leftInset={i === ROWS - 1 ? '25%' : '1rem'}
           />
         </div>
       ))}
 
       <button
-        onClick={() => navigate('/add')}
+        onClick={() => navigate('/v2/add')}
         className="absolute left-1/2 -translate-x-1/2 h-[55px] px-6 rounded-full flex items-center gap-3 z-30"
         style={{ top: `${BUTTON_TOP_PCT}%`, backgroundColor: 'rgba(217,217,217,0.25)', backdropFilter: 'blur(4px)' }}
       >
