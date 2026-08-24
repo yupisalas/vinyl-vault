@@ -63,7 +63,7 @@ export default function ShelfRowV2({ records, onSelect, onAdd, leftInset = '1rem
         />
         <div
           className="relative flex items-end pr-4 h-full"
-          style={{ paddingLeft: leftInset, paddingBottom: RECORD_BOTTOM_PADDING }}
+          style={{ paddingLeft: `calc(${leftInset} + 12px)`, paddingBottom: RECORD_BOTTOM_PADDING }}
         >
           {records.map((r) => (
             <RecordCardV2 key={r.id} record={r} onClick={() => onSelect(r.id)} />
