@@ -1,5 +1,5 @@
 import type { VinylRecord } from '../../types'
-import RecordCardV2 from './RecordCardV2'
+import RecordCardV2, { MARGIN_AFTER_WANT } from './RecordCardV2'
 
 // Ported from the Figma "estante con discos" component (123:570): the shelf
 // is a sandwich, same as the acrylic shelf's back/front split —
@@ -26,6 +26,7 @@ function PlaceholderSlot({ onAdd }: { onAdd: () => void }) {
       style={{
         width: 92,
         height: 92,
+        marginRight: MARGIN_AFTER_WANT,
         borderRadius: '2px 3px 3px 1px',
         backgroundColor: 'rgba(190,185,175,0.1)',
         border: '1px solid rgba(239,217,181,0.16)',
@@ -61,7 +62,7 @@ export default function ShelfRowV2({ records, onSelect, onAdd, leftInset = '1rem
           style={{ left: leftInset, height: BACK_HEIGHT, backgroundImage: BACK_GRADIENT }}
         />
         <div
-          className="relative flex items-end gap-3 pr-4 h-full"
+          className="relative flex items-end pr-4 h-full"
           style={{ paddingLeft: leftInset, paddingBottom: RECORD_BOTTOM_PADDING }}
         >
           {records.map((r) => (

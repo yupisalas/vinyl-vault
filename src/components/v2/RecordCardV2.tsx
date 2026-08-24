@@ -8,27 +8,31 @@ interface Props {
   onClick?: () => void
 }
 
-// Measured off the Figma "estante con discos" reference (123:570):
-// cover-to-cover gap with no vinyl is ~12px (matches the row's flex gap),
-// and a vinyl peek is ~44px wide overlapping ~16px into its own cover.
+// Measured off the Figma "estante con discos" reference (123:570): a
+// no-vinyl cover-to-cover gap is ~12px, but a record with a vinyl peek
+// already carries ~28px of its own trailing width, and the reference only
+// leaves it another ~2px before the next cover — not another full 12px.
+// Row spacing is per-card margin (not a flat flex gap) so each case can
+// hit its own target.
 const COVER_SIZE = 92
 const VINYL_WIDTH = 44
 const VINYL_OVERLAP = 16
+const TRAILING_VINYL_WIDTH = VINYL_WIDTH - VINYL_OVERLAP
+export const MARGIN_AFTER_WANT = 12
+export const MARGIN_AFTER_HAVE = 2
 
 export default function RecordCardV2({ record, onClick }: Props) {
   const isWant = record.status === 'want'
-
-  // Only the part of the vinyl that doesn't overlap its own cover needs to
-  // reserve flex space — the rest sits on top of the cover art. This keeps
-  // a true 12px gap from the vinyl's own trailing edge to the next card,
-  // not just from the cover underneath it (which would let them collide).
-  const trailingVinylWidth = isWant ? 0 : VINYL_WIDTH - VINYL_OVERLAP
 
   return (
     <button
       onClick={onClick}
       className="relative shrink-0 flex items-end"
-      style={{ width: COVER_SIZE + trailingVinylWidth, height: COVER_SIZE + 4 }}
+      style={{
+        width: COVER_SIZE + (isWant ? 0 : TRAILING_VINYL_WIDTH),
+        height: COVER_SIZE + 4,
+        marginRight: isWant ? MARGIN_AFTER_WANT : MARGIN_AFTER_HAVE,
+      }}
     >
       {!isWant && (
         <div
