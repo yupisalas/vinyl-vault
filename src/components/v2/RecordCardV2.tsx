@@ -8,8 +8,12 @@ interface Props {
   onClick?: () => void
 }
 
+// Measured off the Figma "estante con discos" reference (123:570):
+// cover-to-cover gap with no vinyl is ~12px (matches the row's flex gap),
+// and a vinyl peek is ~44px wide overlapping ~16px into its own cover.
 const COVER_SIZE = 92
-const VINYL_WIDTH = 32
+const VINYL_WIDTH = 44
+const VINYL_OVERLAP = 16
 
 export default function RecordCardV2({ record, onClick }: Props) {
   const isWant = record.status === 'want'
@@ -24,7 +28,7 @@ export default function RecordCardV2({ record, onClick }: Props) {
         <div
           className="absolute pointer-events-none"
           style={{
-            left: COVER_SIZE - 12,
+            left: COVER_SIZE - VINYL_OVERLAP,
             bottom: 0,
             width: VINYL_WIDTH,
             height: COVER_SIZE * 0.94,

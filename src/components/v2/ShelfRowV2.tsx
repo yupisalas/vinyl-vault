@@ -40,9 +40,21 @@ export default function ShelfRowV2({ records, onSelect, onAdd, leftInset = '1rem
           {records.length === 0 ? (
             <button
               onClick={onAdd}
-              className="shrink-0 w-[92px] h-[92px] rounded-[3px] border border-dashed border-white/25 flex items-center justify-center text-white/35 text-[11px] font-mono"
+              className="relative shrink-0"
+              style={{
+                width: 92,
+                height: 92,
+                borderRadius: '2px 3px 3px 1px',
+                backgroundColor: 'rgba(39,38,38,0.2)',
+                boxShadow: '-2px 2px 5px 1px rgba(0,0,0,0.26)',
+              }}
             >
-              [agregar]
+              <span
+                className="absolute inset-0 flex items-center justify-center font-mono"
+                style={{ fontSize: 10, color: 'rgba(132,132,132,0.31)', letterSpacing: '-0.4px' }}
+              >
+                [agregar]
+              </span>
             </button>
           ) : (
             records.map((r) => <RecordCardV2 key={r.id} record={r} onClick={() => onSelect(r.id)} />)
