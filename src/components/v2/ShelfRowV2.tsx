@@ -49,7 +49,7 @@ interface Props {
   onAdd: () => void
   leftInset?: string
   minSlots?: number
-  maxWidth?: number
+  maxWidth?: string | number
 }
 
 export default function ShelfRowV2({ records, onSelect, onAdd, leftInset = '1rem', minSlots = 5, maxWidth }: Props) {
