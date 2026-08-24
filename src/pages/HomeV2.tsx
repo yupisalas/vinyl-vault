@@ -16,6 +16,18 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'want', label: 'Los quiero' },
 ]
 
+// Every position below is copied straight from the Figma frame (402x874,
+// node 123:210 / iPhone 17-1) as a percentage of that frame, so the nav and
+// shelf rows always land on the same spot of the background photo
+// regardless of viewport width. The frame's aspect ratio is applied to the
+// whole page so the photo is never stretched or cropped unexpectedly.
+const FRAME_W = 402
+const FRAME_H = 874
+const NAV_TOP_PCT = (182 / FRAME_H) * 100
+const DIVIDER_TOP_PCT = (204 / FRAME_H) * 100
+const ROW_TOPS_PCT = [233, 364.55, 495.61, 622.73].map((y) => (y / FRAME_H) * 100)
+const BUTTON_TOP_PCT = (795 / FRAME_H) * 100
+
 const ROWS = 4
 
 function chunkIntoRows(records: VinylRecord[], rows: number) {
@@ -58,11 +70,10 @@ export default function HomeV2() {
   }
 
   return (
-    <div
-      className="relative min-h-screen flex flex-col"
-      style={{ backgroundColor: '#1c211f', backgroundImage: `url(${roomBg})`, backgroundSize: '100% auto', backgroundRepeat: 'no-repeat', backgroundPosition: 'top center' }}
-    >
-      <header className="relative px-4 pt-14 pb-3">
+    <div className="relative w-full" style={{ aspectRatio: `${FRAME_W} / ${FRAME_H}`, backgroundColor: '#20241f' }}>
+      <img src={roomBg} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+
+      <header className="absolute left-0 right-0 px-4" style={{ top: `${NAV_TOP_PCT}%` }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-5">
             {FILTERS.map((f) => (
@@ -83,7 +94,6 @@ export default function HomeV2() {
             <img src={menuIcon} alt="Filtrar por categoría" className="w-4 h-3.5" />
           </button>
         </div>
-        <div className="h-px mt-3" style={{ backgroundColor: 'rgba(239,217,181,0.3)' }} />
 
         {menuOpen && (
           <CategoryMenu
@@ -95,19 +105,20 @@ export default function HomeV2() {
           />
         )}
       </header>
+      <div className="absolute left-6 right-6" style={{ top: `${DIVIDER_TOP_PCT}%`, height: 1, backgroundColor: 'rgba(239,217,181,0.3)' }} />
 
-      <main className="flex-1 flex flex-col justify-center gap-1 pb-6">
-        {rows.map((row, i) => (
-          <ShelfRowV2 key={i} records={row} onSelect={(id) => navigate(`/record/${id}`)} onAdd={() => navigate('/add')} />
-        ))}
-      </main>
+      {rows.map((row, i) => (
+        <div key={i} className="absolute left-0 right-0" style={{ top: `${ROW_TOPS_PCT[i]}%` }}>
+          <ShelfRowV2 records={row} onSelect={(id) => navigate(`/record/${id}`)} onAdd={() => navigate('/add')} />
+        </div>
+      ))}
 
       <button
         onClick={() => navigate('/add')}
-        className="fixed bottom-8 left-1/2 -translate-x-1/2 h-[55px] px-6 rounded-full flex items-center gap-3 z-30"
-        style={{ backgroundColor: 'rgba(217,217,217,0.25)', backdropFilter: 'blur(4px)' }}
+        className="absolute left-1/2 -translate-x-1/2 h-[55px] px-6 rounded-full flex items-center gap-3 z-30"
+        style={{ top: `${BUTTON_TOP_PCT}%`, backgroundColor: 'rgba(217,217,217,0.25)', backdropFilter: 'blur(4px)' }}
       >
-        <span className="font-mono text-[12.5px] text-white">Agregar disco</span>
+        <span className="font-mono text-[12.5px] text-white whitespace-nowrap">Agregar disco</span>
         <img src={vinylIcon} alt="" className="w-[38px] h-[38px] rounded-full object-cover" />
       </button>
     </div>
